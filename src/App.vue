@@ -1,76 +1,67 @@
 <template>
   <div id="app">
+    <h2>Мой список задач</h2>
 
-    <LifecycleHooks v-if="isAlive" :title="title" />
+    <div style="text-align: right; margin-bottom: 3rem">
+      <button @click="showFormFunction" v-show="!showForm">Добавить задачу</button>
 
-    <button @click="destroyComponent"> Destroy </button>
+      <form v-show="showForm" @submit.prevent="addTodo" class="form">
+        <input v-model.trim="title" type="text" placeholder="Заголовок">
+        <textarea v-model.trim="description" placeholder="Описание"></textarea>
+        <button type="submit">Добавить</button>
+        <button @click.prevent="cancel">Отмена</button>
+      </form>
+    </div>
 
-    <!-- <Login v-if="isUserLogged" @success="userLogged" />
-    <UserDetails :user="user" /> -->
-    <!-- <div class="elements">
-      <div v-for="post in posts" :key="post.id" class="element">Заголовок: {{ post.title }}</div>
-    </div> -->
+    <div v-show="tasks.length" class="tasks"></div>
+    <div v-show="!tasks.length" class="empty">У вас нету задач, добавьте хотя бы одну</div>
   </div>
 </template>
 
 <script>
-import Login from "@/components/Login.vue";
-import UserDetails from "@/components/UserDetails.vue";
-
 export default {
 	name: "App",
 
 	data() {
 		return {
-			isUserLogged: false,
-			user: {},
-			isLoading: false,
-			posts: [],
-			title: "Title 1",
-			isAlive: true
+			tasks: [],
+			showForm: false,
+			title: "",
+			description: ""
 		};
 	},
 
-	// async created() {
-	//   try {
-	//     this.isLoading = true
-	//     const response = await fetch('https://jsonplaceholder.typicode.com/posts')
-	//     const data = await response.json()
-	//     this.posts = data
-	//   } catch (e) {
-	//     console.log(e)
-	//   } finally {
-	//     this.isLoading = false
-	//   }
-	// },
-
-	async mounted() {},
-
-	beforeDestroy() {
-		// У нас есть доступ к this
-		// HTML элементы не удалены
-	},
-
-	destroyed() {
-		// Компонент уже удален полностью
-	},
-
 	methods: {
-		destroyComponent() {
-			this.isAlive = false;
+		showFormFunction() {
+			this.showForm = true;
 		},
 
-		userLogged(user) {
-			this.isUserLogged = true;
-			this.user = user;
+		addTodo() {
+			if (!this.title.length || !this.description.length) {
+				return alert("Нельзя оставлять поле пустым");
+			}
+
+			const task = {
+				title: this.title,
+				description: this.description,
+				id: Date.now(),
+				isFinished: false
+			};
+
+			this.tasks.push(task);
+			this.title = "";
+			this.description = "";
+			this.showForm = false;
+		},
+
+		cancel() {
+			this.title = "";
+			this.description = "";
+			this.showForm = false;
 		}
 	},
 
-	components: {
-		Login,
-		UserDetails,
-		LifecycleHooks: () => import("@/components/LifecycleHooks.vue")
-	}
+	components: {}
 };
 </script>
 
@@ -84,9 +75,22 @@ export default {
 	margin-top: 60px;
 }
 
-.input {
-	padding: 0.6rem;
-	margin-bottom: 1rem;
-	width: 200px;
+.form {
+	display: flex;
+	flex-direction: column;
+	width: 300px;
+	margin: 0 auto;
+	text-align: center;
+
+	& input,
+	& textarea,
+	& button {
+		margin-bottom: 1rem;
+	}
+
+	& textarea {
+		resize: none;
+		height: 100px;
+	}
 }
 </style>
