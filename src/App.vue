@@ -1,6 +1,16 @@
 <template>
   <div id="app">
-    <h2>Мой список задач</h2>
+
+	  <b-button v-b-modal.modal-1 variant="primary">Button</b-button>
+
+		<b-modal id="modal-1" title="BootstrapVue">
+			<p class="my-4">Hello from modal!</p>
+		</b-modal>
+
+
+
+
+    <!-- <h2>Мой список задач</h2>
 
     <div style="text-align: right; margin-bottom: 3rem">
       <button @click="showFormFunction" v-show="!showForm">Добавить задачу</button>
@@ -13,8 +23,11 @@
       </form>
     </div>
 
-    <div v-show="tasks.length" class="tasks"></div>
-    <div v-show="!tasks.length" class="empty">У вас нету задач, добавьте хотя бы одну</div>
+    <div v-show="tasks.length" class="tasks">
+		<Todo v-for="(todo, idx) in tasks" :key="todo.id" :todo="todo" :idx="idx" @del="deleteTodo" />
+	</div>
+
+    <div v-show="!tasks.length" class="empty">У вас нету задач, добавьте хотя бы одну</div> -->
   </div>
 </template>
 
@@ -31,7 +44,23 @@ export default {
 		};
 	},
 
+	created() {
+		window.addEventListener('beforeunload', this.saveTodos)
+		const tasks = localStorage.getItem('todos')
+		if (tasks) {
+			this.tasks = JSON.parse(tasks)
+		}
+	},
+
 	methods: {
+		saveTodos() {
+			localStorage.setItem('todos', JSON.stringify(this.tasks))
+		},
+
+		deleteTodo(idx) {
+			this.tasks.splice(idx, 1)
+		},
+
 		showFormFunction() {
 			this.showForm = true;
 		},
@@ -60,37 +89,5 @@ export default {
 			this.showForm = false;
 		}
 	},
-
-	components: {}
 };
 </script>
-
-<style lang="scss">
-#app {
-	font-family: Avenir, Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	text-align: center;
-	color: #2c3e50;
-	margin-top: 60px;
-}
-
-.form {
-	display: flex;
-	flex-direction: column;
-	width: 300px;
-	margin: 0 auto;
-	text-align: center;
-
-	& input,
-	& textarea,
-	& button {
-		margin-bottom: 1rem;
-	}
-
-	& textarea {
-		resize: none;
-		height: 100px;
-	}
-}
-</style>
